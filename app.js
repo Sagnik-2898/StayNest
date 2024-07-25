@@ -8,6 +8,9 @@ const Listing = require("./Models/listing");
 const methodoverride = require('method-override');
 const ejsMate = require('ejs-mate');
 const MONGO_URL = "mongodb://127.0.0.1:27017/wanderlust";
+const wrapAsync = require('./utils/wrapAsync');
+const ExpressError = require('./utils/ExpressError');
+const {listingSchema} = require('./schema')
 
 app.set("view engine", "ejs");
 app.set("views", path.join(__dirname, "views"));
@@ -28,16 +31,27 @@ async function main() {
     await mongoose.connect(MONGO_URL);
 }
 
+const validateListing = (req,res,next) =>{
+    let {error} = listingSchema.validate(req.body);
+
+    if(error){
+        let errMsg = error.details.map((el)=>el.message).join(",")
+        throw new ExpressError(400,result.error);
+    }else{
+        next();
+    }
+}
+
 //Root Route
 app.get("/", (req, res) => {
     res.send("Hello I am Listening");
 });
 
 //Index Route
-app.get("/listings", async (req, res) => {
+app.get("/listings", wrapAsync(async (req, res) => {
     const allListings = await Listing.find({});
     res.render("listings/index", { allListings });
-});
+}));
 
 //Create Route
 
@@ -45,34 +59,38 @@ app.get("/listings/new",(req,res)=>{
     res.render("listings/new")
 })
 
-app.post("/listings",async(req,res)=>{
+app.post("/listings",validateListing,wrapAsync(async(req,res,next)=>{
     const newListing = new Listing(req.body.listing);
     await newListing.save();
     res.redirect("/listings")
 })
+)
 
 //Update Route
 
-app.get("/listings/:id/edit",async(req,res)=>{
+app.get("/listings/:id/edit",wrapAsync(async(req,res)=>{
     let {id} = req.params;
     const listing = await Listing.findById(id);
     res.render("listings/edit.ejs",{listing})
-})
+}));
 
-app.put("/listings/:id",async(req,res)=>{
+app.put("/listings/:id",validateListing,wrapAsync(async(req,res)=>{
+    if(!req.body.listing){
+        throw new ExpressError(400,"Send Valid Data for Listing")
+    }
     let {id} = req.params;
     await Listing.findByIdAndUpdate(id,{...req.body.listing})
     res.redirect(`/listings/${id}`)
-})
+}))
 
 //DELETE Route
 
-app.delete("/listings/:id",async(req,res)=>{
+app.delete("/listings/:id",wrapAsync(async(req,res)=>{
     let {id} = req.params;
     let deletedList = await Listing.findByIdAndDelete(id)
     console.log(deletedList)
     res.redirect("/listings")
-})
+}))
 
 
 //Show Route
@@ -82,8 +100,18 @@ app.get("/listings/:id",async(req,res)=>{
     res.render("listings/show",{listing})
 })
 
+//Error Middleware
+
+app.all("*",(req,res,next)=>{
+    next(new ExpressError(404,"Page Not Found!"))
+})
 
 
+app.use((err,req,res,next)=>{
+    let {statusCode = 500, message = "Something Went Wrong"} = err;
+    res.render("error.ejs",{err})
+    // res.status(statusCode).send(message)
+})
 
 
 
