@@ -2,18 +2,15 @@ const express = require('express');
 const app = express();
 const port = 8080;
 const mongoose = require('mongoose');
-const ejs = require('ejs');
 const path = require('path');
-const Listing = require("./Models/listing");
 const methodoverride = require('method-override');
 const ejsMate = require('ejs-mate');
 const MONGO_URL = "mongodb://127.0.0.1:27017/wanderlust";
-const wrapAsync = require('./utils/wrapAsync');
 const ExpressError = require('./utils/ExpressError');
-const { listingSchema, reviewSchema } = require('./schema')
-const Review = require('./Models/review');
 const listings = require('./routes/listing')
 const reviews = require('./routes/review')
+const session = require('express-session')
+const flash = require('connect-flash')
 
 app.set("view engine", "ejs");
 app.set("views", path.join(__dirname, "views"));
@@ -21,6 +18,33 @@ app.use(express.urlencoded({ extended: true }))
 app.use(methodoverride("_method"))
 app.engine("ejs", ejsMate)
 app.use(express.static(path.join(__dirname, "/public")))
+app.use(flash())
+
+
+
+
+const sessionOptions = {
+    secret:"Sagnik2003",
+    resave:false,
+    saveUninitialized : true,
+    cookie:{
+        expires: Date.now() + 7*24*60*60*1000,
+        maxAge : 7*24*60*60*1000,
+        httpOnly : true
+    }
+}
+
+
+app.get("/",(req,res)=>{
+    res.send("Hi I am root")
+})
+
+app.use(session(sessionOptions))
+app.use((req,res,next)=>{
+    res.locals.success = req.flash("success");
+    res.locals.error = req.flash("error");
+    next();
+})
 
 main()
     .then(() => {

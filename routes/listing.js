@@ -20,11 +20,6 @@ const validateListing = (req, res, next) => {
 }
 
 
-//Root Route
-// router.get("/", (req, res) => {
-//     res.send("Hello I am Listening");
-// });
-
 //Index Route
 router.get("/", wrapAsync(async (req, res) => {
     const allListings = await Listing.find({});
@@ -40,6 +35,7 @@ router.get("/new", (req, res) => {
 router.post("/", validateListing, wrapAsync(async (req, res, next) => {
     const newListing = new Listing(req.body.listing);
     await newListing.save();
+    req.flash("success", "New Listing Added!")
     res.redirect("/listings")
 })
 )
@@ -49,7 +45,11 @@ router.post("/", validateListing, wrapAsync(async (req, res, next) => {
 router.get("/:id/edit", wrapAsync(async (req, res) => {
     let { id } = req.params;
     const listing = await Listing.findById(id);
-    res.render("/edit.ejs", { listing })
+    if(!listing){
+        req.flash("error","Listing you requested for does not exist")
+        res.redirect("/listings")
+    }
+    res.render("listings/edit.ejs", { listing })
 }));
 
 router.put("/:id", validateListing, wrapAsync(async (req, res) => {
@@ -58,6 +58,7 @@ router.put("/:id", validateListing, wrapAsync(async (req, res) => {
     }
     let { id } = req.params;
     await Listing.findByIdAndUpdate(id, { ...req.body.listing })
+    req.flash("success", "Listing Updated!")
     res.redirect(`/${id}`)
 }))
 
@@ -67,6 +68,7 @@ router.delete("/:id", wrapAsync(async (req, res) => {
     let { id } = req.params;
     let deletedList = await Listing.findByIdAndDelete(id)
     console.log(deletedList)
+    req.flash("success", "Listing Deleted!")
     res.redirect("/listings")
 }))
 
@@ -74,7 +76,11 @@ router.delete("/:id", wrapAsync(async (req, res) => {
 router.get("/:id", async (req, res) => {
     let { id } = req.params;
     const listing = await Listing.findById(id).populate("reviews");
+    if(!listing){
+        req.flash("error","Listing you requested for does not exist")
+        res.redirect("/listings")
+    }
     res.render("listings/show", { listing })
 })
 
-module.exports = router ;
+module.exports = router;
