@@ -1,1 +1,4 @@
+# Node Modules
 /node_modules
+# DOTENV Enviromental Variables
+.env

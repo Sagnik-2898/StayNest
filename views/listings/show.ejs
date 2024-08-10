@@ -7,7 +7,7 @@
 
   <div class="card col-6 offset-3 show-card listing-card">
     <img
-      src="<%= listing.image %>"
+      src="<%= listing.image.url %>"
       class="card-img-top show-img"
       alt="listing_image"
     />
@@ -52,17 +52,6 @@
     novalidate
     class="needs-validation"
   >
-    <!-- <div class="mb-3 mt-3">
-      <label for="rating" class="form-label">Rating</label>
-      <input
-        type="range"
-        min="1"
-        max="5"
-        id="rating"
-        name="review[rating]"
-        class="form-range"
-      />
-    </div> -->
     <!--  -->
     <div class="mb-3 mt-3">
       <label for="rating" class="form-label">Rating</label>

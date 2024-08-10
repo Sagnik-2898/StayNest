@@ -1,3 +1,8 @@
+if(process.env.NODE_ENV != "production"){
+    require("dotenv").config();
+}
+
+
 const express = require('express');
 const app = express();
 const port = 8080;
@@ -44,9 +49,9 @@ const sessionOptions = {
 
 
 
-// app.get("/",(req,res)=>{
-//     res.send("Hi I am root")
-// })
+app.get("/",(req,res)=>{
+    res.send("Hi I am root")
+})
 
 
 app.use(flash()) // flash messages
