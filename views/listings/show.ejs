@@ -1,5 +1,5 @@
 <% layout("/layouts/boilerplate") %>
-
+<script src="https://api.mapbox.com/mapbox-gl-js/v3.5.1/mapbox-gl.js"></script>
 <div class="row mt-3">
   <div class="col-8 offset-3">
     <h3><%= listing.title %></h3>
@@ -13,8 +13,8 @@
     />
     <div class="card-body">
       <p class="card-text">
-        <!-- <b><%= listing.title %></b><br /> --></p>
-        <!-- <p class="card-text"><i>Owned By: <%= listing.owner.username %></i><br/></p>  -->
+        
+        <p class="card-text"><i>Owned &nbsp; By: &nbsp; @ <%= listing.owner.username %></i><br/></p> 
         <p class="card-text"><%= listing.description %><br /></p>
         <p class="card-text">&#8377; <%= listing.price.toLocaleString("en-IN") %><br /></p>
         <p class="card-text"><%= listing.location %><br /></p>
@@ -88,11 +88,12 @@
   </form>
   <br />
 <% } %>
-  
 
-  <p><b>All Reviews</b></p>
-  <!-- <p><%= listing.reviews %></p> -->
+<% if(listing.reviews.length>0){ %>
   <div class="row">
+    
+  
+  <p><b>All Reviews</b></p>
   <% for(review of listing.reviews) { %>
   <div class="card col-5 ms-3 mb-3">
     <div class="card-body">
@@ -108,4 +109,26 @@
   </div>
   <% } %>
 </div>
+<% } %>
 </div>
+
+
+<div class="col-8 offset-3 mb-3">
+  <h3>Where you'll be</h3>
+  <div id="map"></div>
+</div>
+
+<script>
+	// TO MAKE THE MAP APPEAR YOU MUST
+	// ADD YOUR ACCESS TOKEN FROM
+	// https://account.mapbox.com
+  let maptoken = "<%= process.env.MAP_TOKEN %>"
+  console.log(maptoken)
+	mapboxgl.accessToken = maptoken;
+  const map = new mapboxgl.Map({
+        container: 'map', // container ID
+        style:"mapbox://styles/mapbox/streets-v12",
+        center: [88.4798, 22.5754], // starting position [lng, lat]. Note that lat must be set between -90 and 90
+        zoom: 12 // starting zoom
+    });
+</script>

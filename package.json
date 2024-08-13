@@ -1,7 +1,7 @@
 {
-  "name": "wanderlust",
+  "name": "staynest",
   "version": "1.0.0",
-  "description": "Looks like AirBnb",
+  "description": "An App for Listing and booking for the properties",
   "main": "app.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
