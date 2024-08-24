@@ -1,5 +1,10 @@
 <% layout("/layouts/boilerplate") %>
 <script src="https://api.mapbox.com/mapbox-gl-js/v3.5.1/mapbox-gl.js"></script>
+<script>
+  const mapToken = "<%= process.env.MAP_TOKEN %>"
+  const listing = <%- JSON.stringify(listing) %>
+  
+</script>
 <div class="row mt-3">
   <div class="col-8 offset-3">
     <h3><%= listing.title %></h3>
@@ -100,7 +105,7 @@
       <p class="card-title"> @ <%= review.author.username %>    </p>
       <p class="starability-result card-text" data-rating="<%= review.rating %>"></p>
       <p class="card-text"><%= review.comment %></p>
-      <!-- <p class="card-text"><%= review.rating %>⭐</p> -->
+      
       
       <form class="mb-3" method="POST" action="/listings/<%= listing._id %>/reviews/<%= review._id %>?_method=DELETE">
         <button class="btn btn-sm btn-dark mb-3">Delete</button>
@@ -118,17 +123,4 @@
   <div id="map"></div>
 </div>
 
-<script>
-	// TO MAKE THE MAP APPEAR YOU MUST
-	// ADD YOUR ACCESS TOKEN FROM
-	// https://account.mapbox.com
-  let maptoken = "<%= process.env.MAP_TOKEN %>"
-  console.log(maptoken)
-	mapboxgl.accessToken = maptoken;
-  const map = new mapboxgl.Map({
-        container: 'map', // container ID
-        style:"mapbox://styles/mapbox/streets-v12",
-        center: [88.4798, 22.5754], // starting position [lng, lat]. Note that lat must be set between -90 and 90
-        zoom: 12 // starting zoom
-    });
-</script>
+<script src="/js/map.js"></script>
