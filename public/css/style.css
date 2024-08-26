@@ -15,7 +15,7 @@ body{
     background-color: white;
 }
 
-.fa-crow {
+.fa-earth-americas {
     color: #fe424d;
     font-size: 2rem;
 }
@@ -126,4 +126,13 @@ body{
 #map{
     height: 400px;
     width: 80vh;
+}
+
+#social-link{
+    text-decoration: none !important;
+    color: #222222;
+}
+
+#privacy{
+    margin-right: 0.8rem;
 }

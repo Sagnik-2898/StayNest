@@ -9,12 +9,13 @@ const mongoose = require('mongoose');
 const path = require('path');
 const methodoverride = require('method-override');
 const ejsMate = require('ejs-mate');
-const MONGO_URL = "mongodb://127.0.0.1:27017/wanderlust";
+const dbURL=process.env.ATLASDB_URL;
 const ExpressError = require('./utils/ExpressError');
 const listingRouter = require('./routes/listing')
 const reviewRouter = require('./routes/review')
 const userRouter = require('./routes/user')
 const session = require('express-session')
+const MongoStore = require('connect-mongo')
 const flash = require('connect-flash')
 
 //Passport
@@ -31,12 +32,24 @@ app.use(methodoverride("_method"))
 app.engine("ejs", ejsMate)
 app.use(express.static(path.join(__dirname, "/public")))
 
+// Mongo Sesstion Store
 
+const store = MongoStore.create({
+    mongoUrl: dbURL,
+    crypto:{
+        secret:process.env.SECRET
+    },
+    touchAfter: 24*3600
+})
 
+store.on("error",()=>{
+    console.log("ERROR in MONGO SESSION STORE",err);
+})
 
 //cookie session options
 const sessionOptions = {
-    secret:"Sagnik2003",
+    store,
+    secret:process.env.SECRET,
     resave:false,
     saveUninitialized : true,
     cookie:{
@@ -48,9 +61,13 @@ const sessionOptions = {
 
 
 
+
+
 app.get("/",(req,res)=>{
     res.redirect("/listings")
 })
+
+
 
 
 app.use(flash()) // flash messages
@@ -77,7 +94,6 @@ app.use((req,res,next)=>{
 
 
 
-
 main()
     .then(() => {
         console.log("Connected to DB");
@@ -87,10 +103,17 @@ main()
     });
 
 async function main() {
-    await mongoose.connect(MONGO_URL);
+    await mongoose.connect(dbURL);
 }
 
+app.get("/privacy",(req,res)=>{
+    res.render("listings/privacy.ejs")
+})
 
+
+app.get("/terms",(req,res)=>{
+    res.render("listings/terms.ejs")
+})
 
 
 
